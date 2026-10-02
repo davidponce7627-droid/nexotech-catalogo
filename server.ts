@@ -130,9 +130,10 @@ REGLAS DE RESPUESTA:
 
   // Mount Vite middleware in development; serve dist in production
   if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.resolve(__dirname, 'dist')));
+    const distPath = path.resolve(process.cwd(), 'dist');
+    app.use(express.static(distPath));
     app.get('*', (_req: Request, res: Response) => {
-      res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+      res.sendFile(path.resolve(distPath, 'index.html'));
     });
   } else {
     const vite = await createViteServer({
