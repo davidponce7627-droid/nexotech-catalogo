@@ -1,0 +1,6 @@
+{
+  "name": "NEXO TECH - Catálogo y Refacciones",
+  "description": "Catálogo digital y panel de administración para venta de celulares, refacciones, puertos Tipo-C y componentes tecnológicos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
