@@ -54,10 +54,11 @@ export const Navbar: React.FC = () => {
           <div className="flex md:hidden items-center gap-2">
             <button
               onClick={() => setIsContactModalOpen(true)}
-              className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700"
-              title="Contacto"
+              className="p-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-200"
+              title="Servicio de Reparación & Soporte"
+              aria-label="Servicio de Reparación"
             >
-              <Phone className="w-4 h-4 text-emerald-600" />
+              <Wrench className="w-4 h-4" />
             </button>
 
             <button
@@ -73,18 +74,15 @@ export const Navbar: React.FC = () => {
               )}
             </button>
 
-            <button
-              onClick={requestAdminAccess}
-              className={`p-2 rounded-lg transition-colors cursor-pointer border ${
-                viewMode === 'admin'
-                  ? 'bg-blue-600 text-white border-blue-700'
-                  : 'bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-200'
-              }`}
-              title="Ajustes / Panel"
-              aria-label="Ajustes y Panel"
-            >
-              <Settings className={`w-4 h-4 ${viewMode === 'admin' ? 'rotate-90' : ''} transition-transform`} />
-            </button>
+            {viewMode === 'admin' && (
+              <button
+                onClick={requestAdminAccess}
+                className="p-2 rounded-lg bg-blue-600 text-white border border-blue-700"
+                title="Volver a la tienda"
+              >
+                <Eye className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -123,19 +121,9 @@ export const Navbar: React.FC = () => {
           </form>
         </div>
 
-        {/* Right Side: Contact, Wholesale switch, Cart & Admin Button */}
+        {/* Right Side: Contact, Wholesale switch, Cart & Customer Repair / Profile Button */}
         <div className="hidden md:flex items-center gap-2.5 shrink-0">
           
-          {/* Contact & Location Button */}
-          <button
-            onClick={() => setIsContactModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
-            title="Ver dirección, teléfonos y horarios"
-          >
-            <MapPin className="w-3.5 h-3.5 text-blue-600" />
-            <span>Contacto & Tienda</span>
-          </button>
-
           {/* Wholesale Mode Toggle */}
           <button
             onClick={() => setIsWholesalePricing(!isWholesalePricing)}
@@ -148,6 +136,21 @@ export const Navbar: React.FC = () => {
           >
             <Tag className="w-3.5 h-3.5" />
             <span>{isWholesalePricing ? 'Mayoreo Activo ✓' : 'Ver Mayoreo'}</span>
+          </button>
+
+          {/* Customer Repair & Profile Assistance Button */}
+          <button
+            onClick={() => setIsContactModalOpen(true)}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 hover:border-blue-500 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-bold transition-all cursor-pointer shadow-xs group"
+            title="Servicio de Reparación y Atención a Clientes"
+          >
+            <div className="w-6 h-6 rounded-full bg-blue-100 group-hover:bg-blue-600 text-blue-700 group-hover:text-white flex items-center justify-center transition-colors">
+              <Wrench className="w-3.5 h-3.5" />
+            </div>
+            <div className="text-left leading-tight hidden lg:block">
+              <span className="block text-[10px] text-slate-500 group-hover:text-blue-600 uppercase font-semibold">Taller & Clientes</span>
+              <span className="block font-bold">Reparaciones</span>
+            </div>
           </button>
 
           {/* Cart & Quote Box */}
@@ -173,19 +176,17 @@ export const Navbar: React.FC = () => {
             </div>
           </button>
 
-          {/* Subtle Gear (Tuerca) Admin Access */}
-          <button
-            onClick={requestAdminAccess}
-            className={`p-2.5 rounded-lg transition-colors cursor-pointer border ${
-              viewMode === 'admin'
-                ? 'bg-blue-600 text-white border-blue-700 shadow-xs'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border-slate-200'
-            }`}
-            title="Ajustes de administración"
-            aria-label="Ajustes de administración"
-          >
-            <Settings className={`w-4 h-4 ${viewMode === 'admin' ? 'rotate-90 text-white' : 'text-slate-700'} transition-transform duration-200`} />
-          </button>
+          {/* If admin is currently active, show a quick back to shop badge */}
+          {viewMode === 'admin' && (
+            <button
+              onClick={requestAdminAccess}
+              className="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs border border-blue-700"
+              title="Volver a la vista del cliente"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span>Ver Tienda</span>
+            </button>
+          )}
 
         </div>
 

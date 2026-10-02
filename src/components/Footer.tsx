@@ -104,24 +104,21 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Col 4: Acceso al Administrador */}
+          {/* Col 4: Garantías y Soporte para Talleres */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-              <Settings className="w-3.5 h-3.5 text-slate-400" />
-              <span>Gestión Interna</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+              <span>Garantía & Envíos</span>
             </h4>
             <p className="text-slate-400 text-xs leading-relaxed">
-              Panel protegido con verificación por Gmail y llaves de acceso para administración de inventario y pedidos.
+              Refacciones probadas con sellos de calidad. Precios preferenciales y envíos inmediatos para técnicos y talleres de reparación.
             </p>
             <button
-              onClick={() => {
-                requestAdminAccess();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className="px-3 py-1.5 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-medium text-xs flex items-center gap-1.5 border border-slate-700 transition-colors cursor-pointer"
+              onClick={() => setIsContactModalOpen(true)}
+              className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-medium text-xs flex items-center gap-1.5 border border-slate-700 transition-colors cursor-pointer"
             >
-              <Settings className="w-3.5 h-3.5 text-blue-400" />
-              <span>Ajustes & Panel</span>
+              <Wrench className="w-3.5 h-3.5 text-blue-400" />
+              <span>Solicitar Refacción / Taller</span>
             </button>
           </div>
 
@@ -129,7 +126,21 @@ export const Footer: React.FC = () => {
 
         {/* Bottom bar */}
         <div className="mt-10 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
-          <p>© {new Date().getFullYear()} {settings.name}. Catálogo mayorista de refacciones.</p>
+          <div className="flex items-center gap-2">
+            <p>© {new Date().getFullYear()} {settings.name}. Catálogo mayorista de refacciones.</p>
+            {/* Pequeña tuerca escondida exclusivamente para administradores */}
+            <button
+              onClick={() => {
+                requestAdminAccess();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="opacity-20 hover:opacity-100 p-1 rounded-sm text-slate-500 hover:text-slate-200 hover:bg-slate-800/80 transition-all cursor-pointer inline-flex items-center justify-center ml-1"
+              title="Acceso administrativo"
+              aria-label="Panel interno"
+            >
+              <Settings className="w-3 h-3" />
+            </button>
+          </div>
           <div className="flex items-center gap-2 text-slate-400">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             <span>{settings.warrantyPolicy}</span>
