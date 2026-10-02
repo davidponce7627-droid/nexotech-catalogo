@@ -651,27 +651,32 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
 
     const itemsText = order.items
-      .map((item, idx) => `<b>${idx + 1}.</b> [<code>${item.sku}</code>] ${item.name} x <b>${item.quantity}</b> pzs = <b>${settings.currency}${item.total.toLocaleString('es-MX')}</b>`)
+      .map((item, idx) => `  <b>${idx + 1}.</b> [<code>${item.sku}</code>] ${item.name}\n      Cantidad: <b>${item.quantity}</b> pzs x ${settings.currency}${item.unitPrice} = <b>${settings.currency}${item.total.toLocaleString('es-MX')}</b>`)
       .join('\n');
 
-    const message = `🚨 <b>¡NUEVO PEDIDO RECIBIDO EN ${settings.name.toUpperCase()}!</b>\n` +
-      `━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `🧾 <b>Folio:</b> <code>${order.id}</code>\n` +
-      `📅 <b>Fecha:</b> ${order.date}\n` +
-      `👤 <b>Cliente:</b> ${order.customerName}\n` +
-      `📞 <b>Teléfono:</b> ${order.customerPhone}\n` +
-      (order.customerEmail ? `✉️ <b>Email:</b> ${order.customerEmail}\n` : '') +
-      (order.customerAddress ? `📍 <b>Entrega:</b> ${order.customerAddress}\n` : '') +
-      `💳 <b>Pago:</b> ${order.paymentMethod.toUpperCase()} | <b>Envío:</b> ${order.deliveryMethod.replace('_', ' ').toUpperCase()}\n` +
-      `━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `📦 <b>REFACCIONES SOLICITADAS:</b>\n${itemsText}\n` +
-      `━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `💵 <b>Subtotal:</b> ${settings.currency}${order.subtotal.toLocaleString('es-MX')}\n` +
-      `🚚 <b>Envío:</b> ${order.shippingCost === 0 ? 'GRATIS' : `${settings.currency}${order.shippingCost.toLocaleString('es-MX')}`}\n` +
-      `💰 <b>TOTAL ORDEN:</b> <b>${settings.currency}${order.total.toLocaleString('es-MX')} ${settings.currencyCode}</b>\n` +
-      (order.notes ? `📝 <b>Notas:</b> ${order.notes}\n` : '') +
-      `━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `💬 <b>WhatsApp Cliente:</b> https://wa.me/${order.customerPhone.replace(/\D/g, '')}`;
+    const message = `🧾 <b>COMPROBANTE & RECIBO OFICIAL</b>\n` +
+      `🏢 <b>${settings.name.toUpperCase()}</b> · <i>${settings.tagline}</i>\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `📄 <b>N° Folio / Recibo:</b> <code>${order.id}</code>\n` +
+      `📅 <b>Fecha y Hora:</b> ${order.date}\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `👤 <b>DATOS DEL CLIENTE:</b>\n` +
+      `• Nombre: <b>${order.customerName}</b>\n` +
+      `• Teléfono: <b>${order.customerPhone}</b>\n` +
+      (order.customerEmail ? `• Email/Gmail: <code>${order.customerEmail}</code>\n` : '') +
+      (order.customerAddress ? `• Dirección de Entrega: ${order.customerAddress}\n` : '') +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `📦 <b>DETALLE DE REFACCIONES:</b>\n${itemsText}\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `💳 <b>Método de Pago:</b> ${order.paymentMethod.toUpperCase()}\n` +
+      `🚚 <b>Modalidad de Envío:</b> ${order.deliveryMethod.replace('_', ' ').toUpperCase()}\n` +
+      `💵 <b>Subtotal Refacciones:</b> ${settings.currency}${order.subtotal.toLocaleString('es-MX')}\n` +
+      `🚛 <b>Costo de Envío:</b> ${order.shippingCost === 0 ? 'GRATIS' : `${settings.currency}${order.shippingCost.toLocaleString('es-MX')}`}\n` +
+      `💰 <b>TOTAL DEL RECIBO:</b> <b>${settings.currency}${order.total.toLocaleString('es-MX')} ${settings.currencyCode}</b>\n` +
+      (order.notes ? `📝 <b>Instrucciones / Notas:</b> ${order.notes}\n` : '') +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `📲 <b>Abrir Chat WhatsApp:</b> https://wa.me/${order.customerPhone.replace(/\D/g, '')}\n` +
+      `✅ <i>Recibo verificado y sincronizado con base de datos.</i>`;
 
     try {
       const response = await fetch(`https://api.telegram.org/bot${settings.telegramBotToken.trim()}/sendMessage`, {
@@ -1034,6 +1039,32 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     setInquiries(prev => [newInquiry, ...prev]);
+
+    // Auto Dispatch Inquiry to Telegram if enabled
+    if (settings.telegramEnabled && settings.telegramBotToken && settings.telegramChatId) {
+      const inqMsg = `🔧 <b>NUEVA SOLICITUD DE REFACCIÓN / COTIZACIÓN</b>\n` +
+        `🏢 <b>${settings.name.toUpperCase()}</b>\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `📄 <b>Folio Consulta:</b> <code>${newInquiry.id}</code>\n` +
+        `📅 <b>Fecha:</b> ${newInquiry.date}\n` +
+        `👤 <b>Cliente:</b> ${name.trim()}\n` +
+        `📞 <b>Teléfono:</b> ${phone.trim()}\n` +
+        (email?.trim() ? `✉️ <b>Email:</b> ${email.trim()}\n` : '') +
+        `🛠️ <b>Refacción solicitada:</b> ${partNeeded.trim() || 'Consulta técnica / reparación'}\n` +
+        `💬 <b>Mensaje:</b> ${message.trim() || 'Solicita precio y disponibilidad.'}\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `📲 <b>Responder por WhatsApp:</b> https://wa.me/${phone.replace(/\D/g, '')}`;
+
+      fetch(`https://api.telegram.org/bot${settings.telegramBotToken.trim()}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: settings.telegramChatId.trim(),
+          text: inqMsg,
+          parse_mode: 'HTML'
+        })
+      }).catch(err => console.warn('Telegram inq dispatch error:', err));
+    }
 
     // Also register in contacts directory
     setContacts(prev => {
