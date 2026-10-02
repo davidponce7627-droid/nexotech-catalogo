@@ -4,8 +4,6 @@ import {
   X, 
   User, 
   Receipt, 
-  Send, 
-  Bell, 
   CheckCircle2, 
   Clock, 
   Package, 
@@ -14,7 +12,6 @@ import {
   Copy, 
   Check, 
   Search,
-  ExternalLink,
   ShieldCheck,
   Building2,
   Phone,
@@ -36,7 +33,7 @@ export const CustomerPortalModal: React.FC = () => {
     settings 
   } = useStore();
 
-  const [activeTab, setActiveTab] = useState<'recibos' | 'registro' | 'notificaciones'>('recibos');
+  const [activeTab, setActiveTab] = useState<'recibos' | 'registro'>('recibos');
 
   // Registration Form State
   const [formData, setFormData] = useState({
@@ -44,22 +41,19 @@ export const CustomerPortalModal: React.FC = () => {
     phone: currentCustomer?.phone || '',
     email: currentCustomer?.email || '',
     workshopName: currentCustomer?.workshopName || '',
-    address: currentCustomer?.address || '',
-    notifyWhatsapp: currentCustomer?.notifyWhatsapp ?? true,
-    notifyTelegram: currentCustomer?.notifyTelegram ?? true
+    address: currentCustomer?.address || ''
   });
 
   const [regSuccess, setRegSuccess] = useState(false);
   const [searchPhone, setSearchPhone] = useState('');
   const [copiedOrderId, setCopiedOrderId] = useState<string | null>(null);
-  const [selectedReceipt, setSelectedReceipt] = useState<Order | null>(null);
 
   if (!isCustomerPortalOpen) return null;
 
   // Filter orders for this customer
   const customerPhoneClean = (currentCustomer?.phone || searchPhone).replace(/\D/g, '');
   const customerOrders = orders.filter(order => {
-    if (!customerPhoneClean) return true; // Show all recent orders if not filtering
+    if (!customerPhoneClean) return true;
     const orderPhoneClean = (order.customerPhone || '').replace(/\D/g, '');
     return orderPhoneClean.includes(customerPhoneClean) || 
            (order.customerEmail && currentCustomer?.email && order.customerEmail.toLowerCase() === currentCustomer.email.toLowerCase()) ||
@@ -75,9 +69,7 @@ export const CustomerPortalModal: React.FC = () => {
       phone: formData.phone.trim(),
       email: formData.email.trim(),
       workshopName: formData.workshopName.trim(),
-      address: formData.address.trim(),
-      notifyWhatsapp: formData.notifyWhatsapp,
-      notifyTelegram: formData.notifyTelegram
+      address: formData.address.trim()
     });
 
     setRegSuccess(true);
@@ -175,26 +167,14 @@ export const CustomerPortalModal: React.FC = () => {
 
             <button
               onClick={() => setActiveTab('registro')}
-              className={`py-2.5 sm:py-3 px-2 sm:px-3 border-b-2 transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer whitespace-nowrap text-xs ${
+              className={`py-2.5 sm:py-3 px-2.5 sm:px-4 border-b-2 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap text-xs ${
                 activeTab === 'registro'
                   ? 'border-blue-600 text-blue-600 font-bold'
                   : 'border-transparent text-slate-600 hover:text-slate-900'
               }`}
             >
               <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span>{currentCustomer ? 'Mi Perfil' : 'Registrarme'}</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('notificaciones')}
-              className={`py-2.5 sm:py-3 px-2 sm:px-3 border-b-2 transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer whitespace-nowrap text-xs ${
-                activeTab === 'notificaciones'
-                  ? 'border-blue-600 text-blue-600 font-bold'
-                  : 'border-transparent text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
-              <span>Telegram Bot</span>
+              <span>{currentCustomer ? 'Mi Perfil & Datos' : 'Registrarme'}</span>
             </button>
           </div>
 
@@ -455,28 +435,12 @@ export const CustomerPortalModal: React.FC = () => {
                 </div>
               </div>
 
-              {/* Notification preferences */}
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2 text-xs">
-                <span className="font-bold text-slate-800 block">Canales para recibir mis recibos:</span>
-                <label className="flex items-center gap-2 cursor-pointer text-slate-700">
-                  <input
-                    type="checkbox"
-                    checked={formData.notifyWhatsapp}
-                    onChange={(e) => setFormData(prev => ({ ...prev, notifyWhatsapp: e.target.checked }))}
-                    className="rounded text-blue-600 focus:ring-blue-500"
-                  />
-                  <span>Recibir recibos y confirmación de guías de envío vía <strong>WhatsApp</strong></span>
-                </label>
-
-                <label className="flex items-center gap-2 cursor-pointer text-slate-700">
-                  <input
-                    type="checkbox"
-                    checked={formData.notifyTelegram}
-                    onChange={(e) => setFormData(prev => ({ ...prev, notifyTelegram: e.target.checked }))}
-                    className="rounded text-blue-600 focus:ring-blue-500"
-                  />
-                  <span>Recibir alertas en tiempo real vía <strong>Telegram Bot (@devastia_bot)</strong></span>
-                </label>
+              {/* Information note */}
+              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs text-slate-600 flex items-start gap-2.5">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <p>
+                  Al registrarte, tus compras y recibos oficiales con folio se guardarán automáticamente en tu historial y recibirás tus comprobantes directamente en tu WhatsApp y correo.
+                </p>
               </div>
 
               <button
@@ -489,59 +453,10 @@ export const CustomerPortalModal: React.FC = () => {
             </form>
           )}
 
-          {/* TAB 3: NOTIFICACIONES TELEGRAM */}
-          {activeTab === 'notificaciones' && (
-            <div className="space-y-4">
-              <div className="bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-200 rounded-2xl p-5 space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-md">
-                    <Send className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">
-                      Bot Oficial de Notificaciones en Telegram: @devastia_bot
-                    </h3>
-                    <p className="text-xs text-slate-600 mt-1">
-                      Conéctate al canal oficial para recibir confirmaciones de compra, recibos electrónicos con folio y estados de entrega al instante en tu celular.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="bg-white p-4 rounded-xl border border-sky-100 space-y-3">
-                  <div className="text-xs font-bold text-slate-800">
-                    ¿Cómo empezar a recibir notificaciones?
-                  </div>
-                  <ol className="text-xs text-slate-600 space-y-2 list-decimal list-inside">
-                    <li>
-                      Haz clic en el botón azul de abajo para abrir Telegram.
-                    </li>
-                    <li>
-                      Presiona el botón <strong>"Iniciar"</strong> o escribe <code className="bg-slate-100 px-1 py-0.5 rounded text-blue-600 font-mono">/start</code>.
-                    </li>
-                    <li>
-                      ¡Listo! Cada vez que generes un pedido, el bot te enviará el recibo oficial con los precios y datos de envío.
-                    </li>
-                  </ol>
-
-                  <a
-                    href="https://t.me/devastia_bot"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs transition-colors shadow-sm cursor-pointer"
-                  >
-                    <Send className="w-4 h-4" />
-                    <span>Abrir Bot en Telegram (@devastia_bot)</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              </div>
-            </div>
-          )}
-
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+        <div className="p-3.5 sm:p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>Tus datos de compra están protegidos y encriptados localmente.</span>

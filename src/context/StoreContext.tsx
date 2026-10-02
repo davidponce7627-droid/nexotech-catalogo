@@ -1171,7 +1171,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         (newCustomer.workshopName ? `• <b>Taller / Negocio:</b> ${newCustomer.workshopName}\n` : '') +
         (newCustomer.email ? `• <b>Email:</b> ${newCustomer.email}\n` : '') +
         (newCustomer.address ? `• <b>Dirección:</b> ${newCustomer.address}\n` : '') +
-        `• <b>Notificaciones:</b> ${newCustomer.notifyTelegram ? 'Telegram Activo ✓' : 'WhatsApp'}\n` +
+        `• <b>Origen:</b> Registro directo en Catálogo Web\n` +
         `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
         `📲 <b>WhatsApp:</b> https://wa.me/${newCustomer.phone.replace(/\D/g, '')}`;
 
