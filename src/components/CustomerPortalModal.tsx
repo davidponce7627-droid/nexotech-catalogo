@@ -164,16 +164,16 @@ export const CustomerPortalModal: React.FC = () => {
             <div>
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <h2 className="text-sm sm:text-lg font-bold tracking-tight">
-                  Portal de Clientes & Talleres
+                  Mi Cuenta / Recibos de Compra
                 </h2>
                 <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 sm:px-2 sm:py-0.5 rounded-full bg-white/20 text-white">
-                  Usuarios
+                  Historial
                 </span>
               </div>
               <p className="text-[11px] sm:text-xs text-blue-100 truncate max-w-[220px] sm:max-w-none">
                 {currentCustomer 
-                  ? `Sesión activa: ${currentCustomer.name}` 
-                  : 'Consulta tus recibos, folios de pedido y alertas en vivo'}
+                  ? `Sesión: ${currentCustomer.name}` 
+                  : 'Consulta tus comprobantes oficiales, folios y pedidos'}
               </p>
             </div>
           </div>
@@ -409,10 +409,10 @@ export const CustomerPortalModal: React.FC = () => {
                   <div className="flex items-center justify-between gap-2">
                     <div>
                       <span className="text-xs font-bold text-slate-900 block">
-                        Inicio Rápido para Clientes
+                        Acceso con Google
                       </span>
                       <p className="text-[11px] text-slate-500">
-                        Inicia sesión con tu cuenta de Google para guardar tus compras y recibos en 1 clic.
+                        Inicia sesión con tu cuenta de Google para guardar tus compras y recibos oficiales.
                       </p>
                     </div>
                   </div>
@@ -429,7 +429,7 @@ export const CustomerPortalModal: React.FC = () => {
                       <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
                       <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
                     </svg>
-                    <span>{isGoogleLoading ? 'Conectando con Google...' : 'Continuar con Google como Cliente'}</span>
+                    <span>{isGoogleLoading ? 'Conectando con Google...' : 'Continuar con Google'}</span>
                   </button>
 
                   {googleMsg && (
@@ -450,10 +450,10 @@ export const CustomerPortalModal: React.FC = () => {
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-3.5 text-xs text-blue-900 space-y-1">
                   <div className="font-bold flex items-center gap-1.5">
                     <ShieldCheck className="w-4 h-4 text-blue-600" />
-                    <span>Datos de Facturación / Entrega del Comprador o Taller</span>
+                    <span>Datos de Entrega y Facturación</span>
                   </div>
                   <p className="text-blue-700">
-                    Registra o actualiza tus datos de contacto para que tus cotizaciones y recibos salgan con tu información.
+                    Registra o actualiza tus datos para que tus cotizaciones y recibos salgan con tu información.
                   </p>
                 </div>
 
