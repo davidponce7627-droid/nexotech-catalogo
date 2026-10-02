@@ -27,18 +27,29 @@ export const CartDrawer: React.FC = () => {
     cartTotal,
     settings,
     createOrder,
-    isWholesalePricing 
+    isWholesalePricing,
+    currentCustomer 
   } = useStore();
 
-  const [customerName, setCustomerName] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
-  const [customerAddress, setCustomerAddress] = useState('');
+  const [customerName, setCustomerName] = useState(currentCustomer?.name || '');
+  const [customerPhone, setCustomerPhone] = useState(currentCustomer?.phone || '');
+  const [customerEmail, setCustomerEmail] = useState(currentCustomer?.email || '');
+  const [customerAddress, setCustomerAddress] = useState(currentCustomer?.address || '');
   const [deliveryMethod, setDeliveryMethod] = useState<Order['deliveryMethod']>('recoger_tienda');
   const [paymentMethod, setPaymentMethod] = useState<Order['paymentMethod']>('transferencia');
   const [orderNotes, setOrderNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  // Sync with registered customer profile
+  React.useEffect(() => {
+    if (currentCustomer && isCartOpen) {
+      if (!customerName && currentCustomer.name) setCustomerName(currentCustomer.name);
+      if (!customerPhone && currentCustomer.phone) setCustomerPhone(currentCustomer.phone);
+      if (!customerEmail && currentCustomer.email) setCustomerEmail(currentCustomer.email);
+      if (!customerAddress && currentCustomer.address) setCustomerAddress(currentCustomer.address);
+    }
+  }, [currentCustomer, isCartOpen]);
 
   // Gmail Verification States
   const [isGmailVerified, setIsGmailVerified] = useState(false);

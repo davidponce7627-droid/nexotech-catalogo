@@ -119,55 +119,55 @@ export const CustomerPortalModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-2xs overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-2xs overflow-y-auto">
       <div 
-        className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-6 flex flex-col max-h-[92vh]"
+        className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-4 sm:my-6 flex flex-col max-h-[94vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-5 text-white flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white">
-              <UserCheck className="w-5 h-5" />
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-3.5 sm:p-5 text-white flex items-center justify-between">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shrink-0">
+              <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold tracking-tight">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h2 className="text-sm sm:text-lg font-bold tracking-tight">
                   Portal de Clientes & Talleres
                 </h2>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-white/20 text-white">
-                  Exclusivo Usuarios
+                <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 sm:px-2 sm:py-0.5 rounded-full bg-white/20 text-white">
+                  Usuarios
                 </span>
               </div>
-              <p className="text-xs text-blue-100">
+              <p className="text-[11px] sm:text-xs text-blue-100 truncate max-w-[220px] sm:max-w-none">
                 {currentCustomer 
-                  ? `Sesión activa: ${currentCustomer.name} ${currentCustomer.workshopName ? `(${currentCustomer.workshopName})` : ''}` 
-                  : 'Consulta tus recibos, folios de pedido y alertas de entrega en vivo'}
+                  ? `Sesión activa: ${currentCustomer.name}` 
+                  : 'Consulta tus recibos, folios de pedido y alertas en vivo'}
               </p>
             </div>
           </div>
 
           <button 
             onClick={() => setIsCustomerPortalOpen(false)}
-            className="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="bg-slate-50 border-b border-slate-200 px-5 flex items-center justify-between gap-2 overflow-x-auto text-xs font-semibold">
-          <div className="flex items-center gap-1 sm:gap-2">
+        <div className="bg-slate-50 border-b border-slate-200 px-3 sm:px-5 flex items-center justify-between gap-1 overflow-x-auto text-xs font-semibold scrollbar-none">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             <button
               onClick={() => setActiveTab('recibos')}
-              className={`py-3 px-3 border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`py-2.5 sm:py-3 px-2 sm:px-3 border-b-2 transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer whitespace-nowrap text-xs ${
                 activeTab === 'recibos'
                   ? 'border-blue-600 text-blue-600 font-bold'
                   : 'border-transparent text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Receipt className="w-4 h-4" />
-              <span>Mis Recibos & Pedidos</span>
+              <Receipt className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>Mis Recibos</span>
               <span className="bg-blue-100 text-blue-800 text-[10px] px-1.5 py-0.2 rounded-full">
                 {customerOrders.length}
               </span>
@@ -175,43 +175,43 @@ export const CustomerPortalModal: React.FC = () => {
 
             <button
               onClick={() => setActiveTab('registro')}
-              className={`py-3 px-3 border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`py-2.5 sm:py-3 px-2 sm:px-3 border-b-2 transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer whitespace-nowrap text-xs ${
                 activeTab === 'registro'
                   ? 'border-blue-600 text-blue-600 font-bold'
                   : 'border-transparent text-slate-600 hover:text-slate-900'
               }`}
             >
-              <User className="w-4 h-4" />
-              <span>{currentCustomer ? 'Mi Perfil de Cliente' : 'Registrarme'}</span>
+              <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>{currentCustomer ? 'Mi Perfil' : 'Registrarme'}</span>
             </button>
 
             <button
               onClick={() => setActiveTab('notificaciones')}
-              className={`py-3 px-3 border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`py-2.5 sm:py-3 px-2 sm:px-3 border-b-2 transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer whitespace-nowrap text-xs ${
                 activeTab === 'notificaciones'
                   ? 'border-blue-600 text-blue-600 font-bold'
                   : 'border-transparent text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Bell className="w-4 h-4 text-emerald-600" />
-              <span>Notificaciones Telegram</span>
+              <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
+              <span>Telegram Bot</span>
             </button>
           </div>
 
           {currentCustomer && (
             <button
               onClick={logoutCustomer}
-              className="text-[11px] text-red-600 hover:text-red-700 flex items-center gap-1 hover:underline shrink-0 py-2 cursor-pointer"
+              className="text-[10px] sm:text-[11px] text-red-600 hover:text-red-700 flex items-center gap-1 hover:underline shrink-0 py-2 cursor-pointer"
               title="Cerrar sesión de cliente en este navegador"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>Cerrar Sesión</span>
+              <span className="hidden sm:inline">Cerrar Sesión</span>
             </button>
           )}
         </div>
 
         {/* Modal Body */}
-        <div className="p-5 overflow-y-auto space-y-5 flex-1">
+        <div className="p-3.5 sm:p-5 overflow-y-auto space-y-4 sm:space-y-5 flex-1">
           
           {/* TAB 1: RECIBOS & PEDIDOS */}
           {activeTab === 'recibos' && (

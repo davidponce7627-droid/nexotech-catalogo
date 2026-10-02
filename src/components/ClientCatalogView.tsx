@@ -8,6 +8,7 @@ import { ProductDetailModal } from './ProductDetailModal';
 import { CartDrawer } from './CartDrawer';
 import { ContactModal } from './ContactModal';
 import { CustomerPortalModal } from './CustomerPortalModal';
+import { MobileBottomNav } from './MobileBottomNav';
 import { OrderSuccessModal } from './OrderSuccessModal';
 import { AdminSecurityModal } from './AdminPanel/AdminSecurityModal';
 import { AIAssistantWidget } from './AIAssistantWidget';
@@ -90,7 +91,7 @@ export const ClientCatalogView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans pb-16 md:pb-0">
       
       {/* Top Announcement Bar */}
       <AnnouncementBar />
@@ -360,7 +361,7 @@ export const ClientCatalogView: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-2.5 sm:gap-4">
                 {sortedProducts.map(p => (
                   <ProductCard key={p.id} product={p} />
                 ))}
@@ -396,6 +397,9 @@ export const ClientCatalogView: React.FC = () => {
 
       {/* 24/7 AI Smart Sales & Tech Assistant Widget */}
       <AIAssistantWidget />
+
+      {/* Mobile Sticky Bottom Navigation (Optimizado para teléfonos móviles) */}
+      <MobileBottomNav />
 
       {/* Commercial Clean Footer */}
       <Footer />
