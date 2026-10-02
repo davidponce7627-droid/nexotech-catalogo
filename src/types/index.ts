@@ -8,6 +8,8 @@ export interface RegisteredCustomer {
   registeredAt: string;
   notifyTelegram?: boolean;
   notifyWhatsapp?: boolean;
+  isGoogleAccount?: boolean;
+  avatarUrl?: string;
 }
 
 export interface AdminKey {

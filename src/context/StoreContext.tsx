@@ -110,6 +110,7 @@ interface StoreContextType {
   setIsCustomerPortalOpen: (open: boolean) => void;
   currentCustomer: RegisteredCustomer | null;
   registerCustomer: (customerData: Omit<RegisteredCustomer, 'id' | 'registeredAt'>) => RegisteredCustomer;
+  loginCustomerWithGoogle: () => Promise<{ success: boolean; message: string; customer?: RegisteredCustomer }>;
   logoutCustomer: () => void;
 
   selectedCategory: string;
@@ -553,6 +554,59 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       return { 
         success: false, 
         message: err.message || 'Error al conectar con Google Sign-In.' 
+      };
+    }
+  };
+
+  const loginCustomerWithGoogle = async (): Promise<{ success: boolean; message: string; customer?: RegisteredCustomer }> => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      if (!user) {
+        return { success: false, message: 'No se completó el inicio de sesión con Google.' };
+      }
+
+      const email = user.email || '';
+      const name = user.displayName || user.email?.split('@')[0] || 'Cliente';
+      const avatarUrl = user.photoURL || undefined;
+
+      // Check if this customer was already in contacts or saved customer
+      const existingContact = contacts.find(c => c.email && c.email.toLowerCase() === email.toLowerCase());
+
+      const customerObj: RegisteredCustomer = {
+        id: currentCustomer?.id || `CUST-G-${Date.now().toString().slice(-6)}`,
+        name: existingContact?.name || name,
+        email: email,
+        phone: existingContact?.phone || currentCustomer?.phone || '',
+        workshopName: existingContact?.businessName || currentCustomer?.workshopName || '',
+        address: existingContact?.address || currentCustomer?.address || '',
+        registeredAt: currentCustomer?.registeredAt || new Date().toLocaleDateString('es-MX'),
+        isGoogleAccount: true,
+        avatarUrl: avatarUrl
+      };
+
+      setCurrentCustomer(customerObj);
+      try {
+        localStorage.setItem(STORAGE_KEYS.CUSTOMER, JSON.stringify(customerObj));
+      } catch {}
+
+      // Keep clients in client mode
+      const authorizedAdminEmail = (settings.adminEmail || 'dr2490761@gmail.com').toLowerCase();
+      if (email.toLowerCase() !== authorizedAdminEmail) {
+        setIsAuthenticatedAdmin(false);
+        setViewMode('client');
+      }
+
+      return {
+        success: true,
+        message: `¡Sesión iniciada con éxito! Bienvenido, ${customerObj.name}.`,
+        customer: customerObj
+      };
+    } catch (err: any) {
+      console.error('Customer Google Login error:', err);
+      return {
+        success: false,
+        message: err.message || 'Error al iniciar sesión con Google.'
       };
     }
   };
@@ -1280,6 +1334,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setIsCustomerPortalOpen,
         currentCustomer,
         registerCustomer,
+        loginCustomerWithGoogle,
         logoutCustomer,
         gmailReceipts,
         sendCustomerReceiptByEmail,
