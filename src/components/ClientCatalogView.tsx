@@ -7,6 +7,7 @@ import { ProductCard } from './ProductCard';
 import { ProductDetailModal } from './ProductDetailModal';
 import { CartDrawer } from './CartDrawer';
 import { ContactModal } from './ContactModal';
+import { CustomerPortalModal } from './CustomerPortalModal';
 import { OrderSuccessModal } from './OrderSuccessModal';
 import { AdminSecurityModal } from './AdminPanel/AdminSecurityModal';
 import { AIAssistantWidget } from './AIAssistantWidget';
@@ -383,6 +384,9 @@ export const ClientCatalogView: React.FC = () => {
 
       {/* Order Success & Receipt Modal */}
       <OrderSuccessModal />
+
+      {/* Customer & Workshop Portal Modal (Registro, Recibos & Notificaciones) */}
+      <CustomerPortalModal />
 
       {/* Contact & Location Modal */}
       <ContactModal />

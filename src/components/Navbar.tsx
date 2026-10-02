@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStore } from '../context/StoreContext';
-import { Search, ShoppingCart, ShieldCheck, MessageCircle, Eye, Wrench, Tag, MapPin, Phone, Settings } from 'lucide-react';
+import { Search, ShoppingCart, ShieldCheck, MessageCircle, Eye, Wrench, Tag, MapPin, Phone, Settings, User, Receipt } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { 
@@ -17,7 +17,9 @@ export const Navbar: React.FC = () => {
     categories,
     isWholesalePricing,
     setIsWholesalePricing,
-    setIsContactModalOpen 
+    setIsContactModalOpen,
+    setIsCustomerPortalOpen,
+    currentCustomer
   } = useStore();
 
   const handleCategoryClick = (catId: string) => {
@@ -51,7 +53,17 @@ export const Navbar: React.FC = () => {
           </button>
 
           {/* Mobile Buttons */}
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-1.5">
+            {/* User / Customer Portal (Registro, Recibos & Notificaciones) */}
+            <button
+              onClick={() => setIsCustomerPortalOpen(true)}
+              className="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200"
+              title="Mi Cuenta, Recibos y Registro"
+              aria-label="Portal de Clientes"
+            >
+              <User className="w-4 h-4" />
+            </button>
+
             <button
               onClick={() => setIsContactModalOpen(true)}
               className="p-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-200"
@@ -121,8 +133,8 @@ export const Navbar: React.FC = () => {
           </form>
         </div>
 
-        {/* Right Side: Contact, Wholesale switch, Cart & Customer Repair / Profile Button */}
-        <div className="hidden md:flex items-center gap-2.5 shrink-0">
+        {/* Right Side: Contact, Wholesale switch, Customer Portal, Cart & Repair Button */}
+        <div className="hidden md:flex items-center gap-2 shrink-0">
           
           {/* Wholesale Mode Toggle */}
           <button
@@ -138,7 +150,26 @@ export const Navbar: React.FC = () => {
             <span>{isWholesalePricing ? 'Mayoreo Activo ✓' : 'Ver Mayoreo'}</span>
           </button>
 
-          {/* Customer Repair & Profile Assistance Button */}
+          {/* User/Customer Portal Button (Registro, Recibos & Notificaciones) - SOLO PARA CLIENTES */}
+          <button
+            onClick={() => setIsCustomerPortalOpen(true)}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-indigo-200 hover:border-indigo-400 bg-indigo-50/70 hover:bg-indigo-100/90 text-indigo-900 text-xs font-bold transition-all cursor-pointer shadow-xs group"
+            title="Área de Usuarios: Registro, Recibos y Notificaciones"
+          >
+            <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center transition-transform group-hover:scale-105 shrink-0">
+              <User className="w-3.5 h-3.5" />
+            </div>
+            <div className="text-left leading-tight hidden lg:block">
+              <span className="block text-[10px] text-indigo-600 uppercase font-semibold">
+                {currentCustomer ? 'Mi Cuenta' : 'Usuarios'}
+              </span>
+              <span className="block font-bold">
+                {currentCustomer ? `${currentCustomer.name.split(' ')[0]} (Recibos)` : 'Registrarse / Recibos'}
+              </span>
+            </div>
+          </button>
+
+          {/* Customer Repair & Assistance Button */}
           <button
             onClick={() => setIsContactModalOpen(true)}
             className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 hover:border-blue-500 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-bold transition-all cursor-pointer shadow-xs group"

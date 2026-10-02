@@ -8,7 +8,8 @@ import {
   AdminKey, 
   ContactInquiry, 
   CustomerContact,
-  GmailReceipt 
+  GmailReceipt,
+  RegisteredCustomer 
 } from '../types';
 import { 
   initialStoreSettings, 
@@ -104,6 +105,13 @@ interface StoreContextType {
   isSecurityModalOpen: boolean;
   setIsSecurityModalOpen: (open: boolean) => void;
   
+  // Customer Portal (Registro de usuarios, Notificaciones y Recibos)
+  isCustomerPortalOpen: boolean;
+  setIsCustomerPortalOpen: (open: boolean) => void;
+  currentCustomer: RegisteredCustomer | null;
+  registerCustomer: (customerData: Omit<RegisteredCustomer, 'id' | 'registeredAt'>) => RegisteredCustomer;
+  logoutCustomer: () => void;
+
   selectedCategory: string;
   setSelectedCategory: (catId: string) => void;
   searchQuery: string;
@@ -133,7 +141,8 @@ const STORAGE_KEYS = {
   INQUIRIES: 'nexotech_inquiries_v3',
   WHOLESALE_MODE: 'nexotech_wholesale_mode_v3',
   AUTH: 'nexotech_admin_auth_v3',
-  GMAIL_RECEIPTS: 'nexotech_gmail_receipts_v3'
+  GMAIL_RECEIPTS: 'nexotech_gmail_receipts_v3',
+  CUSTOMER: 'nexotech_customer_v1'
 };
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -171,6 +180,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (!parsed.telegramChatId || parsed.telegramChatId === '-1002345678901') {
           parsed.telegramChatId = '5466915332';
         }
+        // Preload active Telegram Bot Token from user
+        if (!parsed.telegramBotToken) {
+          parsed.telegramBotToken = '7558835682:AAGKq0vheMlKSJsDGYy41nQ2jqSHbMiVCj0';
+        }
+        parsed.telegramEnabled = true;
         if (!parsed.adminEmail) parsed.adminEmail = 'dr2490761@gmail.com';
         if (!parsed.currencyCode) parsed.currencyCode = 'USD';
         if (!parsed.currency) parsed.currency = '$';
@@ -288,9 +302,20 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Modals & Popups
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState<boolean>(false);
+  const [isCustomerPortalOpen, setIsCustomerPortalOpen] = useState<boolean>(false);
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState<boolean>(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [latestCreatedOrder, setLatestCreatedOrder] = useState<Order | null>(null);
+
+  // Customer Session (Buyers / Technicians Portal)
+  const [currentCustomer, setCurrentCustomer] = useState<RegisteredCustomer | null>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.CUSTOMER);
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
 
   // Authentication
   const [isAuthenticatedAdmin, setIsAuthenticatedAdmin] = useState<boolean>(() => {
@@ -1099,6 +1124,74 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setInquiries(prev => prev.map(i => i.id === id ? { ...i, status } : i));
   };
 
+  const registerCustomer = (customerData: Omit<RegisteredCustomer, 'id' | 'registeredAt'>): RegisteredCustomer => {
+    const newCustomer: RegisteredCustomer = {
+      ...customerData,
+      id: `CUST-${Date.now().toString().slice(-6)}`,
+      registeredAt: new Date().toLocaleDateString('es-MX')
+    };
+    setCurrentCustomer(newCustomer);
+    try {
+      localStorage.setItem(STORAGE_KEYS.CUSTOMER, JSON.stringify(newCustomer));
+    } catch {}
+
+    // Register in contacts directory
+    setContacts(prev => {
+      const cleanPhone = customerData.phone.trim();
+      if (!prev.some(c => c.phone.trim() === cleanPhone)) {
+        return [
+          {
+            id: `cont-${Date.now()}`,
+            name: customerData.name.trim(),
+            businessName: customerData.workshopName?.trim(),
+            phone: customerData.phone.trim(),
+            whatsapp: customerData.phone.replace(/\D/g, ''),
+            email: customerData.email?.trim(),
+            address: customerData.address?.trim(),
+            totalOrders: 0,
+            totalSpent: 0,
+            lastOrderDate: new Date().toLocaleDateString('es-MX'),
+            category: 'taller',
+            createdAt: new Date().toLocaleDateString('es-MX'),
+            notes: 'Cliente registrado desde el Portal de Clientes'
+          },
+          ...prev
+        ];
+      }
+      return prev;
+    });
+
+    // Alert Telegram bot about new registered user/workshop
+    if (settings.telegramEnabled && settings.telegramBotToken && settings.telegramChatId) {
+      const regMsg = `👤 <b>¡NUEVO CLIENTE / TALLER REGISTRADO!</b>\n` +
+        `🏢 <b>${settings.name.toUpperCase()}</b>\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `• <b>Nombre:</b> ${newCustomer.name}\n` +
+        `• <b>Teléfono:</b> ${newCustomer.phone}\n` +
+        (newCustomer.workshopName ? `• <b>Taller / Negocio:</b> ${newCustomer.workshopName}\n` : '') +
+        (newCustomer.email ? `• <b>Email:</b> ${newCustomer.email}\n` : '') +
+        (newCustomer.address ? `• <b>Dirección:</b> ${newCustomer.address}\n` : '') +
+        `• <b>Notificaciones:</b> ${newCustomer.notifyTelegram ? 'Telegram Activo ✓' : 'WhatsApp'}\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `📲 <b>WhatsApp:</b> https://wa.me/${newCustomer.phone.replace(/\D/g, '')}`;
+
+      fetch(`https://api.telegram.org/bot${settings.telegramBotToken.trim()}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: settings.telegramChatId.trim(), text: regMsg, parse_mode: 'HTML' })
+      }).catch(err => console.warn('Telegram reg alert error:', err));
+    }
+
+    return newCustomer;
+  };
+
+  const logoutCustomer = () => {
+    setCurrentCustomer(null);
+    try {
+      localStorage.removeItem(STORAGE_KEYS.CUSTOMER);
+    } catch {}
+  };
+
   // Reset & Backup
   const resetToDefaults = () => {
     if (window.confirm("¿Seguro que deseas restablecer todos los productos, contactos y configuraciones a los valores de fábrica?")) {
@@ -1183,6 +1276,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateInquiryStatus,
         isContactModalOpen,
         setIsContactModalOpen,
+        isCustomerPortalOpen,
+        setIsCustomerPortalOpen,
+        currentCustomer,
+        registerCustomer,
+        logoutCustomer,
         gmailReceipts,
         sendCustomerReceiptByEmail,
         exportGmailDatabaseCSV,

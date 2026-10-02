@@ -1,3 +1,15 @@
+export interface RegisteredCustomer {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  workshopName?: string;
+  address?: string;
+  registeredAt: string;
+  notifyTelegram?: boolean;
+  notifyWhatsapp?: boolean;
+}
+
 export interface AdminKey {
   id: string;
   label: string;
