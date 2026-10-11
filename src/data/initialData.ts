@@ -63,7 +63,7 @@ export const initialStoreSettings: StoreSettings = {
     }
   ],
   // Telegram Bot Integration
-  telegramBotToken: "7558835682:AAGKq0vheMlKSJsDGYy41nQ2jqSHbMiVCj0",
+  telegramBotToken: "",
   telegramChatId: "5466915332",
   telegramEnabled: true,
   emailNotificationsEnabled: true,

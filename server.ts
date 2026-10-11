@@ -30,6 +30,37 @@ async function startServer() {
     res.json({ status: 'ok', time: new Date().toISOString() });
   });
 
+  // Secure server-side Telegram dispatch proxy
+  app.post('/api/telegram/send', async (req: Request, res: Response) => {
+    try {
+      const { text, chatId, token } = req.body;
+      const botToken = (process.env.TELEGRAM_BOT_TOKEN || token || '').trim();
+      const targetChatId = (process.env.TELEGRAM_CHAT_ID || chatId || '5466915332').trim();
+
+      if (!botToken || !text) {
+        res.status(400).json({ ok: false, error: 'Token o mensaje faltante' });
+        return;
+      }
+
+      const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+      const response = await fetch(telegramUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: targetChatId,
+          text: text,
+          parse_mode: 'HTML'
+        })
+      });
+
+      const data = await response.json();
+      res.json(data);
+    } catch (err: any) {
+      console.error('Error in /api/telegram/send:', err);
+      res.status(500).json({ ok: false, error: err.message || 'Error al enviar a Telegram' });
+    }
+  });
+
   // Assistant route for Sales, Product Consultations & Technical Support
   app.post('/api/gemini/assistant', async (req: Request, res: Response) => {
     try {

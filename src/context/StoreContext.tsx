@@ -181,9 +181,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (!parsed.telegramChatId || parsed.telegramChatId === '-1002345678901') {
           parsed.telegramChatId = '5466915332';
         }
-        // Preload active Telegram Bot Token from user
+        // Preload active Telegram Bot Token from user or environment
         if (!parsed.telegramBotToken) {
-          parsed.telegramBotToken = '7558835682:AAGKq0vheMlKSJsDGYy41nQ2jqSHbMiVCj0';
+          parsed.telegramBotToken = '';
         }
         parsed.telegramEnabled = true;
         if (!parsed.adminEmail) parsed.adminEmail = 'dr2490761@gmail.com';
@@ -551,6 +551,16 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     } catch (err: any) {
       console.error('Google Sign-In Error:', err);
+      if (err.code === 'auth/unauthorized-domain' || (err.message && err.message.includes('auth/unauthorized-domain'))) {
+        const domain = typeof window !== 'undefined' ? window.location.hostname : 'tu dominio';
+        return {
+          success: false,
+          message: `Dominio no autorizado en Firebase ("${domain}"). Para habilitarlo: Ve a Firebase Console > Authentication > Settings > Authorized domains y agrega "${domain}". Mientras tanto, puedes ingresar con tu Contraseña / PIN Maestro.`
+        };
+      }
+      if (err.code === 'auth/popup-closed-by-user') {
+        return { success: false, message: 'La ventana de inicio de sesión de Google fue cerrada antes de completarse.' };
+      }
       return { 
         success: false, 
         message: err.message || 'Error al conectar con Google Sign-In.' 
@@ -604,6 +614,16 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       };
     } catch (err: any) {
       console.error('Customer Google Login error:', err);
+      if (err.code === 'auth/unauthorized-domain' || (err.message && err.message.includes('auth/unauthorized-domain'))) {
+        const domain = typeof window !== 'undefined' ? window.location.hostname : 'tu dominio';
+        return {
+          success: false,
+          message: `El dominio "${domain}" requiere autorización en Firebase Console > Authentication > Authorized domains. Mientras tanto, puedes completar tus datos abajo en un momento.`
+        };
+      }
+      if (err.code === 'auth/popup-closed-by-user') {
+        return { success: false, message: 'La ventana de Google fue cerrada antes de completarse.' };
+      }
       return {
         success: false,
         message: err.message || 'Error al iniciar sesión con Google.'
@@ -756,6 +776,20 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
       `📲 <b>Abrir Chat WhatsApp:</b> https://wa.me/${order.customerPhone.replace(/\D/g, '')}\n` +
       `✅ <i>Recibo verificado y sincronizado con base de datos.</i>`;
+
+    try {
+      const proxyRes = await fetch('/api/telegram/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chatId: settings.telegramChatId.trim(),
+          token: settings.telegramBotToken.trim(),
+          text: message
+        })
+      });
+      const proxyData = await proxyRes.json();
+      if (proxyData.ok) return true;
+    } catch {}
 
     try {
       const response = await fetch(`https://api.telegram.org/bot${settings.telegramBotToken.trim()}/sendMessage`, {
